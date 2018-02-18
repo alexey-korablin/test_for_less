@@ -1,0 +1,90 @@
+@color: #bde;
+@font-size: 20px;
+@circle-width: 40px;
+@circle-height: 40px;
+
+h1 {
+    color: @color;
+}
+
+p {
+    color: @color - 100;
+    font-size: @font-size;
+}
+
+#circle() {
+    background-color: #cbd;
+    border-radius: 100%;
+}
+
+#small-circle {
+    width: @circle-width;
+    height: @circle-height;
+    #circle;
+}
+
+#big-circle {
+    width: @circle-width + 30;
+    height: @circle-height + 30;
+    #circle;
+}
+
+#circle0 (@size: 25px) {
+    background-color: #4caf50;
+    border-radius: 100%;
+
+    width: @size;
+    height: @size;
+}
+
+#small-circle0 {
+    #circle0;
+}
+
+#big-circle0 {
+    #circle0(100px);
+}
+
+ul {
+    @color: fff;
+    background-color: #03a9f4;
+    padding: 4px;
+    list-style: none;
+
+    li {
+        color: @color;
+        border-radius: 3px;
+        border: 2px solid #588;
+        margin: 10px 0;
+    }
+}
+
+@div-width: 100px;
+@color: #03a9f4;
+
+div {
+    height: 50px;
+    display: inline-block;
+}
+
+#left {
+    width: @div-width;
+    background-color: @color - 10;
+}
+
+#right {
+    width: @div-width * 2;
+    background-color: @color;
+}
+
+@var: #004590;
+
+#third {
+    height: 50px;
+    width: 50px;
+    background-color: @var;
+
+    &:hover {
+        background-color: fadeout(@var, 50%);
+    }
+}

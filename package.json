@@ -1,0 +1,30 @@
+{
+  "name": "test_for_less",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexey-korablin/test_for_less.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexey-korablin/test_for_less/issues"
+  },
+  "homepage": "https://github.com/alexey-korablin/test_for_less#readme",
+  "devDependencies": {
+    "browser-sync": "^2.23.6",
+    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-autoprefixer": "^4.1.0",
+    "gulp-csso": "^3.0.1",
+    "gulp-less": "^3.5.0",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-notify": "^3.2.0",
+    "gulp-sourcemaps": "^2.6.4"
+  }
+}
