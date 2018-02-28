@@ -229,16 +229,16 @@ div {
     }
   
     @media (min-width: 992px) {
-      .two {
+        .two {
         &:extend(.one);
         color: #777;
-      }
+        }
     }
-  }
+}
   
-  .three {
+.three {
     border-right: 1px solid #000;
-  }
+}
 
 /*Groups selectors work outside media queries*/
 @media screen {
@@ -247,13 +247,54 @@ div {
     }
   
     @media (min-width: 992px) {
-      .two {
-        color: #777;
-      }
+        .two {
+            color: #777;
+        }
     }
-  }
+}
   
-  .test {
+.test {
     &:extend(.one, .two);
     border-right: 1px solid #000;
+}
+
+/* Import of styles in less*/
+@import '_mail.css';          //Compiles according to common css rules. 
+@import (multiple) '_duckduckgo_multiple';
+@import (css) '_mail.css';    //In final css file will be presented on the top of the file.
+@import (less) '_mail.css';
+@import '_duckduckgo';
+
+.canonium {
+    color: #53599a;
+}
+
+@import (reference) '_google';
+@import (multiple) '_duckduckgo_multiple';
+
+.topbar {
+    &:extend(.google-topbar);
+}
+
+@import '_yandex';
+@import '_yahoo';
+@import (less, inline) '_mail_with_filter.css';
+@import (optional) '_not_existed'; //Without the option 'optional' an attempt to compile will couse an error of compilation
+
+/*Variables*/
+@block-background: #f5f5f5;
+@block-color: #333;
+@block-border-color: #ddd;
+
+.block {
+    background-color: @block-background;
+    color: @block-color;
+    border: 1px solid @block-border-color;
+}
+
+/*Variables - screening. The example doesn't work*/
+.element {
+    // filter: e("ms:alwaysHasItsOwnSyntax.For.Stuff()");
+    // filter: ~"ms:alwaysHasItsOwnSyntax.For.Stuff()";
+    // filter: ~'ms:alwaysHasItsOwnSyntax.For.Stuff()';
   }

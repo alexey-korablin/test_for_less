@@ -32,6 +32,11 @@ gulp.task('less', () => {
     }));
 });
 
+gulp.task('css', () => {
+    return gulp.src('app/styles/*.css')
+    .pipe(gulp.dest('build/styles/'));
+})
+
 gulp.task('less:build', () => {
     return gulp.src('app/styles/*.less')
     .pipe(gp.less({
@@ -66,6 +71,6 @@ gulp.task('watch', () => {
 });
 
 gulp.task('build', gulp.series(
-    gulp.parallel('less:build', 'html'),
+    gulp.parallel('less:build', 'html', 'css'),
     gulp.parallel('watch', 'serve')
 ))
