@@ -298,3 +298,66 @@ div {
     // filter: ~"ms:alwaysHasItsOwnSyntax.For.Stuff()";
     // filter: ~'ms:alwaysHasItsOwnSyntax.For.Stuff()';
   }
+
+  /*Interpolation of variables*/
+  @lang-prefix: site;
+  @lang-russian: rus;
+  @lang-english: eng;
+
+  .@{lang-prefix}-@{lang-russian} {
+      content: "@{lang-russian}";
+  }
+
+  .@{lang-prefix}-@{lang-english} {
+      content: "@{lang-english}";
+  }
+
+  @prop: color;
+
+  .widget {
+      @{prop}: #678;
+      background-@{prop}: #890;
+  }
+
+  @cp: c;
+  @c-gray: gray;
+  @c-red: red;
+
+  .gray {
+      background-@{prop}: e("@{@{cp}-gray}");
+      @{prop}: e("@{@{cp}-red}");
+  }
+
+  @margin-small: 45px;
+  @padding-small: 20px;
+
+  @margin-large: 90px;
+  @padding-large: 40px;
+
+  @size: small;
+
+  .block {
+      margin: ~"@{margin-@{size}}";
+      /*padding: ~"@{margin-@{size}}" + ~"@{padding-@{size}}"; // Так не сработает, потому что после преобразования будут получены строки. Less, версия которого младше по крайней мере версии 2.7.1 не производит математические операции над строками*/
+      /*Решение может быть таким:*/
+      @margin: "margin-@{size}";
+      @padding: "padding-@{size}";
+      margin: @@margin + @@padding;
+  }
+
+  /*Naming of variables*/
+  /*Example*/
+/* Дефис*/
+@grid-breakpoint-xsmall: 540px;
+@navbar-item-color: #777;
+@pagination-border-color: #ddd;
+
+// Нижнее подчёркивание (under_score)
+@hamburger_border_radius: @border_radius;
+@line_height_computed: 24px;
+@font_awesome_path: "../vendor/font-awesome/font";
+
+// Верблюжья нотация (camelCase)
+@labelFontSize: 0.8em;
+@commentBackground: #FFFFFF;
+@authorHoverColor: @primaryColorHover;
