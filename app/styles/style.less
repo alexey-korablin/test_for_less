@@ -416,3 +416,67 @@ div {
   .link {
     .transition(@duration: 1s); // для передачи значений параметров идущих попорядку слева на-право можно просто указать значения: .transition(linear, .5s);
   }
+
+  /*Special parameters and comparing of templates*/
+  //переменная @arguments
+  .box-shadow(@x: 0, @y: 0, @blur: 1px, @color: #333) {
+    -webkit-box-shadow: @arguments; //содержит в себе все значения параметров
+       -moz-box-shadow: @arguments;
+            box-shadow: @arguments;
+  }
+  
+  .big-block {
+    .box-shadow(2px, 5px);
+  }
+
+  //Переменная @rest
+  .mixin(@width: 152px, @height: 20px, @rest...)  {
+    width: @width;
+    height: @height;
+    border: @rest; // содержит 2px, solid, #ddd
+  }
+  
+  .class {
+    .mixin(304px, 40px, 2px, solid, #ddd);
+  }
+
+  //Сопоставление шаблонов
+  .mixin(@color) {
+    color: @color;
+  }
+  
+  .mixin(@color, @bg) {
+    color: @color;
+    background-color: @bg;
+  }
+  
+  .mixin(@color, @bg, @border-color) {
+    color: @color;
+    background-color: @bg;
+    border: 1px solid @border-color;
+  }
+
+  .test-1 {
+    .mixin(#333);
+  } //скомпилируется в: .test-1 { color: #333333; }
+
+  .test-3 {
+    .mixin(#333, #fff, #ddd);
+  }//скомпилируется в: .test-3 {color: #333333; background-color: #ffffff; border: 1px solid #dddddd; }
+
+  //  параметры в примесях указаны по умолчанию, а вызов происходит без значений
+  .mixin(@color: #777) {
+    color: @color;
+  }
+  
+  .mixin(@color: #000, @bg: #fff) {
+    color: @color;
+    background-color: @bg;
+  }
+  //скомпилируется в:
+//   .class {
+//     color: #777777; // два значения color т.к. обе примеси подходят под шаблон
+//     color: #000000;
+//     background-color: #ffffff;
+//   }
+
