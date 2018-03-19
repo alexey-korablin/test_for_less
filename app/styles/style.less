@@ -345,8 +345,8 @@ div {
       margin: @@margin + @@padding;
   }
 
-  /*Naming of variables*/
-  /*Example*/
+/*Naming of variables*/
+/*Example*/
 /* Дефис*/
 @grid-breakpoint-xsmall: 540px;
 @navbar-item-color: #777;
@@ -361,3 +361,58 @@ div {
 @labelFontSize: 0.8em;
 @commentBackground: #FFFFFF;
 @authorHoverColor: @primaryColorHover;
+
+/* Mix-ins*/
+.bordered {
+    border-top: dotted 1px #333;
+    border-bottom: solid 2px #333;
+}
+
+.article {
+    .bordered; // все свойства .bordered станут доступны в .article
+    color: #443d3d;
+}
+
+  //чистая примесь
+  .bordered() { //круглые скобки говорят компилятору, что создавать .bordered не нужно
+    border-top: dotted 1px #333;
+    border-bottom: solid 2px #333;
+  }
+  
+  .article {
+    .bordered;
+    color: #443d3d;
+  }
+
+  //примеси с параметрами. Параметров может быть больше одного, разделители - , или ;. Пример: (@a, @b), либо (@a; @b)
+  .bordered(@_color) { //принимает значение для параметра @_color
+    border-top: dotted 1px @_color;
+    border-bottom: solid 2px @_color;
+  }
+  
+  .article {
+    .bordered(#ccc); //передаем значение параметра
+    color: #443d3d;
+  }
+
+  //значение по умолчанию
+  .bordered(@_color: #ccc) { //при отсуствии параметра ошибки не будет
+    border-top: dotted 1px @_color;
+    border-bottom: solid 2px @_color;
+  }
+  
+  .article {
+    .bordered();
+    color: #443d3d;
+  }
+
+  //изменение части параметров
+  .transition(@function: ease, @duration: .3s, @property: all) {
+    transition-timing-function: @function;
+    transition-duration: @duration;
+    transition-property: @property;
+  }
+  
+  .link {
+    .transition(@duration: 1s); // для передачи значений параметров идущих попорядку слева на-право можно просто указать значения: .transition(linear, .5s);
+  }
