@@ -480,3 +480,429 @@ div {
 //     background-color: #ffffff;
 //   }
 
+
+/*Work with rule set*/
+@element: {
+    color: #777;
+  
+    &.active {
+      color: #000;
+    }
+  };
+  
+  .item {
+    @element();
+}
+
+//скомпилируется в:
+// .item {
+//     color: #777;
+//   }
+//   .item.active {
+//     color: #000;
+//   }
+
+//Набор правил как функция обратного вызова
+.screen(@min, @max, @ruleset) {
+    @media (min-width: @min) and (max-width: (@max - 1)) {
+      @ruleset();
+    }
+}
+//Вызов
+.class {
+    background-color: #000;
+  
+    .screen(768px, 1200px, {
+      background-color: #fff;
+    });
+}
+//Результат
+// .class {
+//     background-color: #000;
+//   }
+//   @media (min-width: 768px) and (max-width: 1199px) {
+//     .class {
+//       background-color: #fff;
+//     }
+// }
+
+//Набор правил как область видимости
+ /*OPERATIONS WITH PROPERTIES*/
+ /*Mergу of properties*/
+/*When the result must be separated by comma use '+'*/
+.depth-top() {
+    box-shadow+: 0 2px 5px 0 rgba(0, 0, 0, 0.16);
+}
+  
+.depth-bottom() {
+    box-shadow+: 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+//Результат
+.block {
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
+/*When the result must be separated by space use '+_'*/
+.scale(@scale) {
+    transform+_: scale(@scale);
+}
+  
+.rotate(@angle) {
+    transform+_: rotate(@angle);
+}
+  
+.translate(@px) {
+    transform+_: translateX(@px);
+}
+  
+.block {
+    .scale(1.75);
+    .rotate(45deg);
+    .translate(10px);
+}
+//Результат
+// .block {
+//     transform: scale(1.75) rotate(45deg) translateX(10px);
+//   }
+
+/*Strings and lists*/
+//Replace
+.bg(@path, @width, @height) {
+    background-image: url(@path);
+  
+    @media only screen and (min-resolution: (1.5 * 96dpi)), only screen and (min-resolution: (1.5 * 1dppx)) {
+      @retina: replace(@path, "(\.[0-9a-z]+)$", "@2x$1", "i"); //заменяем .png на @2x.png
+      background-image: url(@retina);
+      background-size: @width @height;
+    }
+  }
+  
+  .block {
+    .bg("../images/header-bg.png", 18px, 18px);
+  }
+
+//Result
+// .block {
+//     background-image: url("../images/header-bg.png");
+//   }
+  
+//   @media only screen and (min-resolution: 144dpi), only screen and (min-resolution: 1.5dppx) {
+//     .block {
+//       background-image: url("../images/header-bg@2x.png");
+//       background-size: 18px 18px;
+//     }
+//   }
+
+//Списки
+@column-name: col;
+@column-count: 4;
+@column-prefix: xs, sm, md, lg;
+
+// Генератор селекторов
+.generate-class(@indexCount, @indexPrefix: 1) when (@indexPrefix =< length(@column-prefix)) {
+
+  // Получаем элемент списка
+  @prefix: extract(@column-prefix, @indexPrefix);
+
+  // Формируем селектор
+  .@{column-name}-@{prefix}-@{indexCount} {
+    width: @indexCount * (100% / @column-count);
+  }
+
+  // Порождаем следующую итерацию
+  .generate-class(@indexCount, @indexPrefix + 1);
+}
+
+// Генератор сетки
+.make-grid(@indexCount: 1) when (@indexCount =< @column-count) {
+
+  // Вызываем генератор селекторов
+  .generate-class(@indexCount);
+
+  // Порождаем следующую итерацию
+  .make-grid(@indexCount + 1);
+
+}
+
+// Вызываем генератор сетки
+.make-grid();
+
+//Результат
+// .col-xs-1 { width: 25%; }
+// .col-sm-1 { width: 25%; }
+// .col-md-1 { width: 25%; }
+// .col-lg-1 { width: 25%; }
+// ...
+// .col-xs-4 { width: 100%; }
+// .col-sm-4 { width: 100%; }
+// .col-md-4 { width: 100%; }
+// .col-lg-4 { width: 100%; }
+
+/*work with images*/
+//Один файл
+@logo-path: "../../images/avatar.jpg";
+
+.logo {
+  @logo-width: image-width(@logo-path);
+  @logo-height: image-height(@logo-path);
+  @logo-size: image-size(@logo-path);
+
+  content: "@{logo-size} [@{logo-width} x @{logo-height}]";
+}
+//Результат
+// .logo {
+//     content: "460px 460px [460px x 460px]";
+//   }
+
+//Синтаксис
+// .logo {
+//     background-image: data-uri(mimetype, path);
+//   }
+
+// Результаты работы функции data-uri
+// .logo {
+//     background-image: data-uri("image.jpg");
+//     // url("data:image/jpeg;base64,/9j/7gAOQWRvYmUAZAAAAAAA/9sAQwA...")
+  
+//     background-image: data-uri("image/jpeg;base64", "image.jpg");
+//     // url("data:image/jpeg;base64,/9j/7gAOQWRvYmUAZAAAAAAA/9sAQwA...")
+  
+//     background-image: data-uri("image.png");
+//     // url("data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAB...")
+  
+//     background-image: data-uri("image.gif");
+//     // url("data:image/gif;base64,R0lGODlhQABAAPeAAP7+/v39/fz8/Pv7...")
+  
+//     background-image: data-uri("image.svg");
+//     // url("data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20e...")
+  
+//     background-image: data-uri("image/svg+xml;charset=UTF-8", "image.svg");
+//     // url("data:image/svg+xml;charset=UTF-8,%3C%3Fxml%20version%3...")
+//   }
+
+//svg-градиенты
+.gradient {
+    background-image: svg-gradient(ellipse at center, blue, red 15%);
+  }
+//результат
+// .gradient {
+//     background-image: url('data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20%3F%3E%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20version%3D%221.1%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%201%201%22%20preserveAspectRatio%3D%22none%22%3E%3CradialGradient%20id%3D%22gradient%22%20gradientUnits%3D%22userSpaceOnUse%22%20cx%3D%2250%25%22%20cy%3D%2250%25%22%20r%3D%2275%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230000ff%22%2F%3E%3Cstop%20offset%3D%2215%25%22%20stop-color%3D%22%23ff0000%22%2F%3E%3C%2FradialGradient%3E%3Crect%20x%3D%22-50%22%20y%3D%22-50%22%20width%3D%22101%22%20height%3D%22101%22%20fill%3D%22url(%23gradient)%22%20%2F%3E%3C%2Fsvg%3E');
+//   }
+
+/*Working with data types and units*/
+//convert
+.selector {
+    content: convert(10s, "ms");
+    // В результате
+    // 10000ms
+  }
+
+//Функция unit() и get-unit()
+// unit(10px)  // 10
+// unit(10rem) // 10
+// unit(10cm)  // 10
+
+// // Такой единицы нет в CSS
+// unit(10apple) // 10
+
+// get-unit(10px)  // px
+// get-unit(10rem) // rem
+// get-unit(10cm)  // cm
+
+// // Такой единицы нет в CSS
+// get-unit(10apple) // apple
+
+// // Строка
+// get-unit("10string") // ""
+
+//Работа с типами данных
+// isnumber(value)
+// isstring(value)
+// iscolor(value)
+// iskeyword(value)
+// isurl(value)
+// ispixel(value)
+// isem(value)
+// ispercentage(value)
+// isruleset(value)
+
+/*Maths functions*/
+// Округление значений
+// ceil(14.3) // 15
+// ceil(13.9) // 14
+// ceil(14.5) // 15
+// floor(14.3) // 14
+// floor(13.9) // 13
+// floor(14.5) // 14
+// round(14.3) // 14
+// round(13.9) // 14
+// round(14.5) // 15
+
+// // Знаки после запятой
+// round(14.0714)    // 14
+// round(14.0714, 1) // 14.1
+// round(14.0714, 2) // 14.07
+// round(14.0714, 3) // 14.071
+// round(14.0714, 4) // 14.074
+// round(14.0714, 7) // 14.074
+// percentage(0.25) // 25%
+// percentage(1 / 25) // 4%
+
+//Прочие функции
+// sin(value)
+// cosvalue)
+// tan(value)
+// asin(value)
+// acos(value)
+// atan(value)
+// abs(value)
+// mod(valueOne, valueTwo)
+// min(list) // min(1, 14, 19, 0.3)
+// max(list) // max(1%, 10%, 4%, 8%)
+// sqrt(value)
+// pow(value, power) // value в power степени
+// pi()
+
+/*Working with colors*/
+//Функции определения цвета
+// rgb(red, green, blue)
+// rgba(red, green, blue, alpha)
+// argb(rgba(red, green, blue, alpha))
+//Семейство HSL
+//hsl(hue, saturation, lightness)
+// hsl(60, 100%, 50%)      // #ffff00
+// hsla(60, 100%, 50%, .5) // rgba(255, 255, 0, 0.5)
+// Семейство HSV (HSB)
+// hsv(hue, saturation, value)
+// hsva(hue, saturation, value, alpha)
+// hsv(60, 100%, 50%)      // #808000
+// hsva(60, 100%, 50%, .5) // rgba(128, 128, 0, 0.3)
+// Для RGB:
+// red()
+// green()
+// blue()
+// Для HSL:
+// hue()
+// saturation()
+// lightness()
+// Для HSV:
+// hsvhue()
+// hsvsaturation()
+// hsvvalue()
+// Общие функции для RGB, HSL и HSV:
+// aplha()
+// luma()
+// luminance()
+//Манипулирование насыщенностью цвета (Saturate и Desaturate)
+// @hsl: hsl(60, 40%, 50%) // #b2b34d
+// saturate(@hsl, 20%)     // #cccc33
+// @hsl: hsl(60, 60%, 50%) // #cccc33
+// desaturate(@hsl, 20%)   // #b3b34c
+//Осветление и затемнение цвета (Lighten и Darken)
+//lighten()
+//darken()
+// Работа с прозрачностью (Fade, Fadein, Fadeout)
+// fade()
+// fadein()
+// fadeout()
+// Управление тоном (Spin)
+// spin(hsl(245, 50%, 50%), -45) // #4095bf
+// hsl(200, 50%, 50%) // #4095bf?
+// spin(#ccc, 40%)    // #cccccc
+// spin(#aaaaaa, 10%) // #aaaaaa
+// Смешивание цветов в пропорциях (Mix)
+// mix(rgba(255, 255, 255, 1), rgba(255, 255, 255, .5), 50%)
+// // rgba(255, 255, 255, 0.75)
+// mix(rgba(255, 255, 255, .8), rgba(255, 255, 255, .2), 60%)
+// // rgba(255, 255, 255, 0.56)
+// Обесцвечивание цвета (Grayscale)
+// grayscale()
+// desaturate()
+// Нахождение контрастного цвета (Contrast)
+// contrast(#fff) // #000
+// contrast(green, black, white, 30%) // #000
+// contrast(green, black, white, 43%) // #fff
+// contrast(green, black, white, 80%) // #fff
+
+/*Conditional statements*/
+// .mixin(@a, @b) when (выражение) {
+//     // True
+//   }
+
+//Логическое НЕ, И и ИЛИ
+.mixin(@value) when not (@value = 0) {
+    color: #777;
+}
+.mixin(@value) when (@value > 0) and (@value =< 100) {
+    color: #777;
+}
+//или
+.mixin(@value) when (@value > 0), (@value =< 100) {
+    color: #777;
+}
+.mixin(@value) when (@value > 0) or (@value = -1) {
+    content: @value;
+}
+//Работа с типами данных
+.return-number(@number) when (isnumber(@number)) {
+    content: @number;
+  }
+  
+  .true {
+    .return-number(123);
+  }
+  
+  .false {
+    .return-number("123");
+  }
+//Конструкция if {} else {}
+.mixin(@a, @b) when (@a > @b) {
+    content: if;
+}
+  
+.mixin(@a, @b) when (default()) {
+    content: else;
+}
+//Конструкция if {} else if {} else {}
+.mixin(@a, @b) when (@a > @b) {
+    content: if;
+  }
+  
+  .mixin(@a, @b) when (@a < @b) {
+    content: else if;
+  }
+  
+  .mixin(@a, @b) when (default()) {
+    content: else;
+  }
+
+.padding(@t: none, @r: none, @b: none, @l: none) {
+    & when not (@t = none) { padding+_: @t; }
+    & when not (@r = none) { padding+_: @r; }
+    & when not (@b = none) { padding+_: @b; }
+    & when not (@l = none) { padding+_: @l; }
+}
+//результат
+// .padding(1px)      // padding: 1px;
+// .padding(1px, 2px) // padding: 1px 2px;
+
+//Примеси как функции и условные конструкции
+.mixin(@a) {
+    & when (@a = 1) {
+      @return: value;
+    }
+}
+//вызов вернет ошибку, переменная @return недоступна
+.test {
+    .mixin(1);
+    content: @return;
+}
+//так ошибки не будет
+.mixin(@a) when (@a = 1) {
+    @return: value;
+  }
+  
+  .test {
+    .mixin(1);
+    content: @return;
+  }
